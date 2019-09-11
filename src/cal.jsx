@@ -22,11 +22,24 @@ class Cal extends Component {
             <this.CalBtnArr symbolArr={symbol} />
           ))}
         </div>
+        <button onClick={this.test}>test</button>
       </div>
     );
   }
-  MatchSymbol(a) {
-    console.log(a);
+  MatchSymbol(str) {
+    console.log(str);
+    console.log(str.join().charCodeAt(0));
+    let strCode = str.join().charCodeAt(0);
+    if (strCode > 47 && strCode < 58) {
+      this.isNum();
+    }
+  }
+
+  isNum = num => {
+    console.log("is num");
+  };
+  test() {
+    console.log(this);
   }
 
   CalBtnArr = ({ symbolArr }) => (
