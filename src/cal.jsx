@@ -8,8 +8,8 @@ const symobls = [symbols1, symbols2, symbols3, symbols4];
 
 class Cal extends Component {
   state = {
-    upperDisplay: "DisplayUpper",
-    lowerDisplay: "DisplayLower"
+    upperDisplay: "upper",
+    lowerDisplay: "lower"
   };
 
   render() {
@@ -31,16 +31,38 @@ class Cal extends Component {
     console.log(str.join().charCodeAt(0));
     let strCode = str.join().charCodeAt(0);
     if (strCode > 47 && strCode < 58) {
-      this.isNum();
+      this.isNum(str);
+    } else if (strCode < 70 && strCode > 60) {
+      this.isCommand(str);
+    } else {
+      this.isOp(str);
     }
   }
 
-  isNum = num => {
-    console.log("is num");
+  isOp = op => {
+    console.log(op);
+    this.updateUpper(op);
   };
-  test() {
-    console.log(this);
-  }
+
+  isCommand = command => {
+    console.log(command);
+    this.updateUpper();
+  };
+
+  isNum = num => {
+    console.log(num);
+    this.updateLower(num);
+  };
+
+  updateUpper = input => {
+    console.log("update upper");
+  };
+
+  updateLower = newElement => {
+    //console.log(newElement);
+    this.setState({ lowerDisplay: this.state.lowerDisplay + newElement });
+    //console.log('this.state.lowerDisplay');
+  };
 
   CalBtnArr = ({ symbolArr }) => (
     <tr>
