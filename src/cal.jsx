@@ -8,8 +8,8 @@ const symobls = [symbols1, symbols2, symbols3, symbols4];
 
 class Cal extends Component {
   state = {
-    upperDisplay: "upper",
-    lowerDisplay: "lower"
+    upperDisplay: "",
+    lowerDisplay: ""
   };
 
   render() {
@@ -31,6 +31,8 @@ class Cal extends Component {
     console.log(str.join().charCodeAt(0));
     let strCode = str.join().charCodeAt(0);
     if (strCode > 47 && strCode < 58) {
+      this.isNum(str);
+    } else if (strCode === 46) {
       this.isNum(str);
     } else if (strCode < 70 && strCode > 60) {
       this.isCommand(str);
@@ -59,7 +61,15 @@ class Cal extends Component {
   };
 
   updateLower = newElement => {
-    //console.log(newElement);
+    if (
+      this.state.lowerDisplay[this.state.lowerDisplay.length - 1] === "." &&
+      newElement === "."
+    ) {
+      console.log("cannot continuously input '.'");
+      return;
+    }
+    console.log("updatelower");
+
     this.setState({ lowerDisplay: this.state.lowerDisplay + newElement });
     //console.log('this.state.lowerDisplay');
   };
