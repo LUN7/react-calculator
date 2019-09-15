@@ -13,42 +13,77 @@ class Cal extends Component {
   };
 
   render() {
+    const displayStyle = {
+      height: "100px"
+    };
+
     return (
       <div>
-        <div>{this.state.upperDisplay}</div>
-        <div>{this.state.lowerDisplay}</div>
-        <div>
+        <div class="jumbotron">
+          <div class="col-8" style={displayStyle}>
+            <h2> {this.state.upperDisplay}</h2>
+            <h1> {this.state.lowerDisplay}</h1>
+          </div>
           {symobls.map(symbol => (
             <this.CalBtnArr symbolArr={symbol} />
           ))}
         </div>
-        <button onClick={this.test}>test</button>
       </div>
     );
   }
   MatchSymbol(str) {
-    console.log(str);
-    console.log(str.join().charCodeAt(0));
+    console.log(str + " is clicked");
+    console.log("the corresponding ASCII code is " + str.join().charCodeAt(0));
     let strCode = str.join().charCodeAt(0);
     if (strCode > 47 && strCode < 58) {
       this.isNum(str);
     } else if (strCode === 46) {
-      this.isNum(str);
+      this.isDot();
     } else if (strCode < 70 && strCode > 60) {
       this.isCommand(str);
     } else {
+      console.log("enter op");
       this.isOp(str);
     }
   }
 
   isOp = op => {
-    console.log(op);
-    this.updateUpper(op);
+    console.log("op is entered");
+    let str = this.state.lowerDisplay;
+    let prevStrCode = str.join().charCodeAt(str.length - 1);
+    console.log(prevStrCode);
+    if (
+      prevStrCode === 43 ||
+      prevStrCode === 45 ||
+      prevStrCode === 215 ||
+      prevStrCode === 247
+    ) {
+      this.updateLower(op);
+      console.log("prev is op");
+      return;
+    } else {
+      this.updateUpper();
+      this.updateLower(op);
+    }
   };
 
-  isCommand = command => {
-    console.log(command);
-    this.updateUpper();
+  isCommand = command => {};
+
+  isDot = () => {
+    let j = this.state.lowerDisplay.length;
+    let hasDot = 0;
+
+    //avoid successive dot input
+    for (let i = 0; i < j; i++) {
+      if (this.state.lowerDisplay[i] === ".") {
+        hasDot = 1;
+      }
+    }
+
+    if (hasDot === 1) {
+      return; //exit when dot is already exit
+    }
+    this.updateLower(".");
   };
 
   isNum = num => {
@@ -58,24 +93,19 @@ class Cal extends Component {
 
   updateUpper = input => {
     console.log("update upper");
+    this.setState({
+      upperDisplay: this.state.upperDisplay + this.state.lowerDisplay,
+      lowerDisplay: ""
+    });
   };
 
   updateLower = newElement => {
-    if (
-      this.state.lowerDisplay[this.state.lowerDisplay.length - 1] === "." &&
-      newElement === "."
-    ) {
-      console.log("cannot continuously input '.'");
-      return;
-    }
     console.log("updatelower");
-
     this.setState({ lowerDisplay: this.state.lowerDisplay + newElement });
-    //console.log('this.state.lowerDisplay');
   };
 
   CalBtnArr = ({ symbolArr }) => (
-    <tr>
+    <tr class="col-8 row">
       {symbolArr.map(SymbolArr => (
         <this.CalBtn symbol={SymbolArr} />
       ))}
@@ -83,10 +113,14 @@ class Cal extends Component {
   );
 
   CalBtn = ({ symbol }) => {
-    console.log(symbol);
     return (
-      <td key={symbol}>
-        <button onClick={() => this.MatchSymbol([symbol])}>{symbol}</button>
+      <td class="my-1 col-2 p-1" key={symbol}>
+        <button
+          class="btn btn-primary btn-block "
+          onClick={() => this.MatchSymbol([symbol])}
+        >
+          {symbol}
+        </button>
       </td>
     );
   };
