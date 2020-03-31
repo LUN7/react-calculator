@@ -1,0 +1,13 @@
+td {
+  padding: 2px;
+}
+button {
+  color: azure;
+  margin: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: 100%;
+  border: 0;
+  background: black;
+  border-style: round;
+}
