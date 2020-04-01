@@ -5,10 +5,11 @@ const symbols1 = ["7", "8", "9", "DEL", "AC"];
 const symbols2 = ["4", "5", "6", "*", "/"];
 const symbols3 = ["1", "2", "3", "+", "-"];
 const symbols4 = ["0", ".", "EXP", "ANS", "EXE"];
-const symobls = [symbols1, symbols2, symbols3, symbols4];
+const symbols = [symbols1, symbols2, symbols3, symbols4];
 
 class Cal extends Component {
   state = {
+    display: "",
     input: "",
     output: ""
   };
@@ -16,20 +17,13 @@ class Cal extends Component {
   render() {
     return (
       <div>
-        <div>
-          <div>
-            <table>
-              <tbody>
-                <tr>
-                  <td> {this.state.input} </td>
-                  <td> {this.state.output} </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div id="cal">
+          <form>
+            <input type="text" id="fname" value={this.state.display} />
+          </form>
           <table>
             <tbody>
-              {symobls.map(symbol => (
+              {symbols.map(symbol => (
                 <this.CalBtnArr symbolArr={symbol} />
               ))}
             </tbody>
@@ -38,62 +32,40 @@ class Cal extends Component {
       </div>
     );
   }
-  MatchSymbol(str) {
-    if (this.state.input === "ERROR") {
-      this.setState({
-        input: ""
-      });
-    }
-    console.log(str + " is clicked");
-    console.log("the corresponding ASCII code is " + str.join().charCodeAt(0));
-    let strCode = str.join().charCodeAt(0);
-    if (strCode > 47 && strCode < 58) {
-      this.updateInput(str);
-    } else if (strCode === 46) {
-      this.updateInput(str);
-    } else if (strCode < 70 && strCode > 60) {
-      this.isCommand(str);
-    } else {
-      console.log("enter op");
-      this.updateInput(str);
-    }
-  }
 
-  updateInput = input => {
-    input = input.toString();
-    if (this.state.input != "") {
-      console.log(this.state.input);
-      this.setState({
-        input: this.state.input + input
-      });
+  keyPressed = symbol => {
+    let displayValue = "";
+    symbol = symbol.toString();
+    console.log("key pressed: ", symbol);
+    if (symbol === "EXE") {
+      displayValue = this.execute();
+    } else if (symbol === "DEL") {
+      displayValue = this.delete();
+    } else if (symbol === "AC") {
+      displayValue = this.clear();
+    } else if (symbol === "EXP") {
+      return;
+    } else if (symbol === "ANS") {
+      displayValue = this.pushInput("(" + this.state.output + ")");
+    } else if (!isNaN(symbol) || symbol === ".") {
+      displayValue = this.pushInput(symbol);
     } else {
-      this.setState({
-        input: input
-      });
+      if (this.state.input === "" && this.state.output !== "") {
+        displayValue = this.pushInput("(" + this.state.output + ")" + symbol);
+      } else {
+        displayValue = this.pushInput(symbol);
+      }
     }
+
+    this.updateDisplay(displayValue);
   };
 
-  isCommand = command => {
-    console.log("command");
-    command = command.toString();
-    if (command === "EXE") {
-      this.execute();
-    } else if (command === "AC") {
-      this.clear();
-    } else if (command === "ANS") {
-      if (this.state.output != "") {
-        this.updateInput("*" + this.state.output);
-      }
-    } else if (command === "DEL") {
-      var input = this.state.input.toString();
-      console.log(typeof input);
-      input = input.slice(0, -1);
-      this.setState({
-        input: input
-      });
-    } else {
-      this.updateInput("e^");
-    }
+  pushInput = input => {
+    input = this.state.input + input;
+    this.setState({
+      input: input
+    });
+    return input;
   };
 
   clear = () => {
@@ -101,22 +73,41 @@ class Cal extends Component {
       input: "",
       output: ""
     });
+    return "";
+  };
+
+  delete = () => {
+    console.log("delete list item");
+    let input = this.state.input.slice(0, -1);
+    this.setState({
+      input: input
+    });
+    return input;
   };
 
   execute = () => {
-    if (this.state.input != "") {
-      var input = this.state.input.toString();
-      var output;
-      try {
-        this.setState({
-          output: evaluate(input)
-        });
-      } catch (e) {
-        this.setState({
-          input: "ERROR"
-        });
-      }
+    let result = "";
+    try {
+      result = evaluate(this.state.input);
+    } catch (error) {
+      console.log("invalid input");
+      this.setState({
+        input: "",
+        output: ""
+      });
+      return "ERROR";
     }
+    this.setState({
+      input: "",
+      output: result
+    });
+    return result;
+  };
+
+  updateDisplay = value => {
+    this.setState({
+      display: value
+    });
   };
 
   CalBtnArr = ({ symbolArr }) => (
@@ -130,7 +121,7 @@ class Cal extends Component {
   CalBtn = ({ symbol }) => {
     return (
       <td key={symbol}>
-        <button onClick={() => this.MatchSymbol([symbol])}>{symbol}</button>
+        <button onClick={() => this.keyPressed([symbol])}>{symbol}</button>
       </td>
     );
   };
